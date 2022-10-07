@@ -1,8 +1,3 @@
-/*
- Copyright Alan Wood 2021
- None of this code to be reused without my written permission
- Intellectual Rights owned by Alan Wood
- */
 package dev.rise.module.impl.movement;
 
 import dev.rise.Rise;
@@ -45,39 +40,47 @@ import org.apache.commons.lang3.RandomUtils;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * This module allows you to fly like a bird. Pretty self explanatory.
+ * This module allows you to fly like a bird.
  */
-@ModuleInfo(name = "Fly", description = "Lets you fly", category = Category.MOVEMENT)
+@ModuleInfo(name = "Fly", description = "Allows you to fly", category = Category.MOVEMENT)
 public final class Fly extends Module {
 
     public static boolean hypixelDisable;
     private final ModeSetting mode = new ModeSetting("Fly Mode", this, "Vanilla", "Vanilla", "Damage", "Creative",
-            "Hypixel New", "Hypixel Fast Lag", "Verus", "Verus Lag", "VerusBlack", "Verus AirJump", "Bow Longjump", "Mush", "Viper", "Bow Fly", "ACR", "ACR2", "Collide",
-            "Spartan", "Aac3", "MCCentral", "Exempted Value", "Kauri", "Taka", "Vicnix", "Wait for Damage", "Old NCP", "Minemenclub",
-            "Redesky", "BlockFly", "Matrix1.17", "Vulcan", "Vulcan2", "MineBox");
+            // Hypixel Flies                                    
+            "Old Hypixel", "Old Hypixel Blink", "Old Hypixel 2", "Old Hypixel Fast Lag",
+            // Verus Flies
+            "Verus Damage", "Verus Lag", "Verus Float", "Verus AirJump",
+            // AAC Flies
+            "AAC3", "AAC5",
+            "Bow Longjump", "Mush", "Viper", "Bow Fly", "ACR", "ACR 2", "Collide",
+            "Air Jump", "MCCentral", "Exempted Value", "Kauri", "Taka", "Vicnix", "Wait for Damage", "Old NCP", "Minemen Club",
+            "Block Fly", "Matrix1.17", 
+            // Vulcan Flies
+            "Vulcan", "Vulcan2", 
+            "Minebox");
 
     private final ModeSetting exemptedValueType = new ModeSetting("Value", this, "1", "1", "2", "3");
-    private final ModeSetting redeskyMode = new ModeSetting("Mode", this, "Stable", "Stable", "Fast");
+    private final ModeSetting aacfiveMode = new ModeSetting("AAC5 Mode", this, "Stable", "Stable", "Fast");
     private final NumberSetting flySpeed = new NumberSetting("Fly Speed", this, 1, 0.1, 9.5, 0.1);
     private final BooleanSetting autoStop = new BooleanSetting("Auto Stop", this, true);
-    private final ModeSetting hypixelFlySpeed = new ModeSetting("Speed", this, "I want my mommy", "I want my mommy", "Normal", "Airstrike", "Intercontinental ballistic missile");
+    private final ModeSetting hypixelFlySpeed = new ModeSetting("Old Hypixel Speed", this, "I want my mommy", "I want my mommy", "Normal", "Airstrike", "Intercontinental ballistic missile");
     private final NumberSetting bowFlyHBoost1 = new NumberSetting("H Boost first tick", this, 4, 0, 8.5, 0.1);
     private final NumberSetting bowFlyVBoost1 = new NumberSetting("V Boost first tick", this, 4, 0, 8.5, 0.1);
     private final NumberSetting bowFlyHBoost2 = new NumberSetting("H Boost second tick", this, 4, 0, 8.5, 0.1);
     private final NumberSetting bowFlyVBoost2 = new NumberSetting("V Boost second tick", this, 4, 0, 8.5, 0.1);
-    private final NumberSetting multiplierInAir = new NumberSetting("MultiplierInAir", this, 1.08, 1, 1.4, 0.1);
+    private final NumberSetting multiplierInAir = new NumberSetting("Multiplier In Air", this, 1.08, 1, 1.4, 0.1);
     private final NumberSetting glide = new NumberSetting("Glide", this, 0.03, 0, 0.1, 0.01);
     private final NumberSetting timer = new NumberSetting("Timer Speed", this, 1, 0.1, 2, 0.1);
     private final BooleanSetting strafe = new BooleanSetting("Strafe", this, true);
-    private final BooleanSetting inf = new BooleanSetting("Inf", this, false);
+    private final BooleanSetting inf = new BooleanSetting("Vulcan Infinite", this, false);
     private final ModeSetting vanillaBypass = new ModeSetting("Vanilla Kick Bypass", this, "Off", "Off", "Motion", "Packet");
     private final BooleanSetting delayKickBypass = new BooleanSetting("Delay Kick Bypass", this, false);
     private final BooleanSetting smoothCamera = new BooleanSetting("Smooth Camera", this, false);
     private final BooleanSetting fakeDamage = new BooleanSetting("Fake Damage", this, false);
     private final NumberSetting viewBobbing = new NumberSetting("View Bobbing", this, 0, 0, 0.1, 0.01);
-    private final BooleanSetting groundSpoof = new BooleanSetting("GroundSpoof", this, false);
+    private final BooleanSetting groundSpoof = new BooleanSetting("Ground Spoof", this, false);
     private final BooleanSetting damage = new BooleanSetting("Damage", this, false);
-    private final BooleanSetting sigmaFastFly = new BooleanSetting("Sigma Fast Fly", this, false);
     private final ConcurrentLinkedQueue<Packet<?>> packets = new ConcurrentLinkedQueue<>();
 
     private int i = 0;
@@ -152,33 +155,32 @@ public final class Fly extends Module {
                 mc.thePlayer.motionY = 0;
                 break;
 
-            case "Verus":
+            case "Verus Damage":
                 PacketUtil.sendPacketWithoutEvent(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
                 MoveUtil.strafe(0);
                 break;
 
-            case "MineBox":
+            case "Minebox":
             case "Damage":
-            case "VerusBlack":
-            case "Minemenclub":
+            case "Verus Float":
+            case "Minemen Club":
             case "Verus Lag":
             case "Vanilla":
                 MoveUtil.stop();
                 break;
 
-            case "Hypixel New":
+            case "Old Hypixel 2":
                 //   MoveUtil.strafe(0.2);
                 break;
 
-            case "Hypixel Fast Lag":
-                if (PlayerUtil.isOnServer("Hypixel"))
-                    PacketUtil.sendPacketWithoutEvent(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+            case "Old Hypixel Fast Lag":
+                PacketUtil.sendPacketWithoutEvent(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
                 MoveUtil.stop();
                 break;
 
-            case "Hypixel":
-            case "Hypixel Blink":
-            case "Hypixel Infinite":
+            case "Old Hypixel":
+            case "Old Hypixel Blink":
+            case "Old Hypixel Infinite":
                 if (pearlSlot != -1) {
                     MoveUtil.stop();
                     pearlSlot = -1;
@@ -233,19 +235,19 @@ public final class Fly extends Module {
 
 
         // Good code?, Who cares.W
-        if (fakeDamage.isEnabled() && !(mode.is("Verus") || mode.is("Minemenclub") || mode.is("Old NCP") || mode.is("Bow Longjump") || mode.is("Vulcan2") || mode.is("Damage") || mode.is("Wait for Damage") || mode.is("Bow Fly") || mode.is("ACR") || mode.is("Aac3") || mode.is("Taka"))) {
+        if (fakeDamage.isEnabled() && !(mode.is("Verus Damage") || mode.is("Minemen Club") || mode.is("Old NCP") || mode.is("Bow Longjump") || mode.is("Vulcan 2") || mode.is("Damage") || mode.is("Wait for Damage") || mode.is("Bow Fly") || mode.is("ACR") || mode.is("AAC3") || mode.is("Taka"))) {
             mc.thePlayer.handleHealthUpdate((byte) 2);
         }
 
         switch (mode.getMode()) {
-            case "Hypixel New":
+            case "Old Hypixel 2":
                 wasos = 0;
                 if (!firstEnable) {
                     firstEnable = true;
                     this.registerNotification("You need speed effect to make the fly work.");
                 }
                 break;
-            case "Redesky":
+            case "AAC5":
                 if (!firstEnable) {
                     firstEnable = true;
                     this.registerNotification("Credits to Dort for the fly.");
@@ -255,7 +257,7 @@ public final class Fly extends Module {
             case "Vulcan":
                 if (inf.isEnabled() && !firstEnable) {
                     firstEnable = true;
-                    this.registerNotification("Having inf on might flag.");
+                    this.registerNotification("Having infinite on might flag.");
                 }
                 break;
 
@@ -263,7 +265,7 @@ public final class Fly extends Module {
                 flag = true;
                 break;
 
-            case "Verus":
+            case "Verus Damage":
                 PacketUtil.sendPacketWithoutEvent(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
                 break;
         }
@@ -274,13 +276,13 @@ public final class Fly extends Module {
     public void onUpdateAlwaysInGui() {
         bowFlyHBoost1.hidden = bowFlyHBoost2.hidden = bowFlyVBoost1.hidden = bowFlyVBoost2.hidden = glide.hidden = timer.hidden = multiplierInAir.hidden = strafe.hidden = !(mode.is("Bow Longjump"));
 
-        autoStop.hidden = !mode.is("Verus");
+        autoStop.hidden = !mode.is("Verus Damage");
 
-        hypixelFlySpeed.hidden = !mode.is("Hypixel New");
+        hypixelFlySpeed.hidden = !mode.is("Old Hypixel 2");
 
-        flySpeed.hidden = !(mode.is("Vanilla") || mode.is("MineBox") || mode.is("Hypixel Fast Lag") || mode.is("Taka") || mode.is("Minemenclub") || mode.is("Old NCP") || mode.is("Mush") || mode.is("Viper") || mode.is("Verus Lag") || mode.is("Verus") || mode.is("Collide") || mode.is("Creative") || mode.is("Damage") || mode.is("Hypixel Infinite") || mode.is("Hypixel Blink") || mode.is("Hypixel"));
+        flySpeed.hidden = !(mode.is("Vanilla") || mode.is("Minebox") || mode.is("Old Hypixel Fast Lag") || mode.is("Taka") || mode.is("Minemenclub") || mode.is("Old NCP") || mode.is("Mush") || mode.is("Viper") || mode.is("Verus Lag") || mode.is("Verus Damage") || mode.is("Collide") || mode.is("Creative") || mode.is("Damage") || mode.is("Old Hypixel Infinite") || mode.is("Old Hypixel Blink") || mode.is("Old Hypixel"));
 
-        fakeDamage.hidden = (mode.is("Verus") || mode.is("Minemenclub") || mode.is("Old NCP") || mode.is("Bow Longjump") || mode.is("Vulcan2") || mode.is("Damage") || mode.is("Wait for Damage") || mode.is("Bow Fly") || mode.is("ACR") || mode.is("Aac3") || mode.is("Taka"));
+        fakeDamage.hidden = (mode.is("Verus") || mode.is("Minemen Club") || mode.is("Old NCP") || mode.is("Bow Longjump") || mode.is("Vulcan 2") || mode.is("Damage") || mode.is("Wait for Damage") || mode.is("Bow Fly") || mode.is("ACR") || mode.is("AAC3") || mode.is("Taka"));
 
         groundSpoof.hidden = !mode.is("Exempted Value");
 
@@ -288,9 +290,9 @@ public final class Fly extends Module {
 
         inf.hidden = !mode.is("Vulcan");
 
-        redeskyMode.hidden = !mode.is("Redesky");
+        redeskyMode.hidden = !mode.is("AAC5");
 
-        timer.hidden = !(mode.is("Hypixel") || mode.is("Hypixel Blink") || mode.is("Old NCP") || mode.is("Bow Longjump"));
+        timer.hidden = !(mode.is("Old Hypixel") || mode.is("Old Hypixel Blink") || mode.is("Old NCP") || mode.is("Bow Longjump"));
 
         vanillaBypass.hidden = !mode.is("Vanilla");
 
@@ -334,7 +336,7 @@ public final class Fly extends Module {
         EntityPlayer.enableCameraYOffset = false;
 
         if (smoothCamera.isEnabled()) {
-            if (mc.thePlayer.posY > oPositionY || mode.is("Aac3")) {
+            if (mc.thePlayer.posY > oPositionY || mode.is("AAC3")) {
                 EntityPlayer.enableCameraYOffset = true;
                 EntityPlayer.cameraYPosition = oPositionY;
             }
@@ -346,12 +348,12 @@ public final class Fly extends Module {
         this.lastMotion = motion;
 
         switch (mode.getMode()) {
-            case "Hypixel Fast Lag": {
+            case "Old Hypixel Fast Lag": {
                 hypixelDisabler();
                 break;
             }
 
-            case "Vulcan2":
+            case "Vulcan 2":
                 ticksSinceFlag++;
                 if (!(PlayerUtil.getBlockRelativeToPlayer(0, -0.2, 0) instanceof BlockAir) && mc.thePlayer.getDistanceSq(startingLocationX, startingLocationY, startingLocationZ) > 4 * 4) {
                     mc.thePlayer.jump();
@@ -519,7 +521,7 @@ public final class Fly extends Module {
                 break;
             }
 
-            case "MineBox":
+            case "Minebox":
             case "Vanilla": {
                 float kickBypassMotion = (float) 0.0626D;
 
@@ -553,7 +555,7 @@ public final class Fly extends Module {
                 break;
             }
 
-            case "Verus": {
+            case "Verus Damage": {
                 if (ticks == 1) {
                     if (mc.thePlayer.isPotionActive(Potion.jump)) {
                         this.registerNotification("Cannot enable " + this.getModuleInfo().name() + " with Jump Boost.");
@@ -609,9 +611,8 @@ public final class Fly extends Module {
                 break;
             }
 
-            case "Minemenclub": {
-                if (MoveUtil.isMoving() && (PlayerUtil.isOnServer("minemen") || PlayerUtil.isOnServer("mineman"))) {
-                    Rise.addChatMessage("made by billionairkse111");
+            case "Minemen Club": {
+                if (MoveUtil.isMoving())) {
                     if (mc.thePlayer.onGround) {
                         if (!beingDmged) {
                             event.setY(event.getY() - (2.5 - Math.random() / 100));
@@ -664,8 +665,8 @@ public final class Fly extends Module {
                 break;
             }
 
-            case "Hypixel":
-            case "Hypixel Blink":
+            case "Old Hypixel":
+            case "Old Hypixel Blink":
                 if (pearlTimer.hasReached(3500L) && pearlSlot != -1) {
                     mc.thePlayer.motionY = mc.gameSettings.keyBindJump.isKeyDown() ? flySpeed.getValue() : mc.gameSettings.keyBindSneak.isKeyDown() ? -flySpeed.getValue() : 0;
 
@@ -676,7 +677,7 @@ public final class Fly extends Module {
                         MoveUtil.strafe(flySpeed.getValue());
                     else
                         MoveUtil.stop();
-                } else if (stage == 2 && mode.is("Hypixel") && PlayerUtil.isOnServer("Hypixel")) {
+                } else if (stage == 2 && mode.is("Hypixel")) {
                     mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + RandomUtils.nextDouble(7E-8, 9E-8), mc.thePlayer.posZ);
                 }
 
@@ -986,7 +987,7 @@ public final class Fly extends Module {
 
                 break;
             }
-            case "ACR2": {
+            case "ACR 2": {
                 MoveUtil.strafe(0.06);
                 if (mc.thePlayer.ticksExisted % 3 == 0) {
                     mc.thePlayer.motionY = 0.40444491418477213;
@@ -1001,7 +1002,7 @@ public final class Fly extends Module {
                 break;
             }
 
-            case "Hypixel Infinite":
+            case "Old Hypixel Infinite":
                 if (pearlTimer.hasReached(3500L) && pearlSlot != -1) {
                     mc.thePlayer.motionY = mc.gameSettings.keyBindJump.isKeyDown() ? flySpeed.getValue() : mc.gameSettings.keyBindSneak.isKeyDown() ? -flySpeed.getValue() : 0;
 
@@ -1012,7 +1013,7 @@ public final class Fly extends Module {
                         MoveUtil.strafe(flySpeed.getValue());
                     else
                         MoveUtil.stop();
-                } else if (stage == 2 && mode.is("Hypixel") && PlayerUtil.isOnServer("Hypixel")) {
+                } else if (stage == 2 && mode.is("Hypixel")) {
                     mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + RandomUtils.nextDouble(7E-8, 9E-8), mc.thePlayer.posZ);
                 }
 
@@ -1109,7 +1110,7 @@ public final class Fly extends Module {
                 break;
             }
 
-            case "Spartan": {
+            case "Air Jump": {
                 if (mc.thePlayer.onGround) {
                     mc.thePlayer.jump();
                 }
@@ -1127,7 +1128,7 @@ public final class Fly extends Module {
                 }
                 break;
             }
-            case "Aac3": {
+            case "AAC3": {
                 mc.timer.timerSpeed = 1f;
                 if (mc.thePlayer.posY < -75) {
                     mc.thePlayer.motionY = 6.9;
@@ -1239,7 +1240,7 @@ public final class Fly extends Module {
                 break;
             }
 
-            case "VerusBlack": {
+            case "Verus Float": {
                 if (mc.gameSettings.keyBindJump.isKeyDown()) {
                     if (mc.thePlayer.ticksExisted % 2 == 0) {
                         mc.thePlayer.motionY = 0.42F;
@@ -1300,7 +1301,7 @@ public final class Fly extends Module {
                 }
                 break;
             }
-            case "BlockFly": {
+            case "Block Fly": {
                 final BlockPos down = new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1, mc.thePlayer.posZ);
                 if (mc.theWorld.getBlockState(down).getBlock() instanceof BlockAir && (mc.thePlayer.inventory.getCurrentItem() != null && mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBlock) && mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), down, EnumFacing.UP, new Vec3(0.5, 0.5, 0.5)))
                     mc.thePlayer.swingItem();
@@ -1340,7 +1341,7 @@ public final class Fly extends Module {
                 stage++;
                 break;
 
-            case "Hypixel Infinite":
+            case "Old Hypixel Infinite":
                 if (pearlSlot == -1) {
                     event.setY(mc.thePlayer.motionY = 0);
                     MoveUtil.setMoveEventSpeed(event, mc.thePlayer.onGround ? MoveUtil.getBaseMoveSpeed() : 3.9);
@@ -1350,7 +1351,7 @@ public final class Fly extends Module {
                     event.setCancelled(true);
                 break;
 
-            case "VerusBlack": {
+            case "Verus Float": {
                 if (ticks % 14 == 0 && mc.thePlayer.onGround) {
                     MoveUtil.strafe(0.69);
                     event.setY(0.42F);
@@ -1364,11 +1365,11 @@ public final class Fly extends Module {
             }
             break;
 
-            case "Hypixel":
+            case "Old Hypixel":
                 if (pearlSlot == -1) {
                     switch (stage) {
                         case 0:
-                            DamageUtil.damagePlayer(DamageUtil.DamageType.POSITION, PlayerUtil.isOnServer("Hypixel") ? 0.03 : 0.0625, true, true);
+                            DamageUtil.damagePlayer(DamageUtil.DamageType.POSITION, ? 0.03 : 0.0625, true, true);
                             stage++;
                             break;
 
@@ -1397,11 +1398,11 @@ public final class Fly extends Module {
                     event.setCancelled(true);
                 break;
 
-            case "Hypixel Blink":
+            case "Old Hypixel Blink":
                 if (pearlSlot == -1) {
                     switch (stage) {
                         case 0:
-                            DamageUtil.damagePlayer(DamageUtil.DamageType.POSITION, PlayerUtil.isOnServer("Hypixel") ? 0.03 : 0.0625, true, true);
+                            DamageUtil.damagePlayer(DamageUtil.DamageType.POSITION, ? 0.03 : 0.0625, true, true);
                             stage++;
                             break;
 
@@ -1495,17 +1496,17 @@ public final class Fly extends Module {
                 break;
             }
 
-            case "Minemenclub": {
+            case "Minemen Club": {
                 if (!jumped)
                     event.setCancelled(true);
                 break;
             }
 
-            case "Redesky": {
+            case "AAC5": {
                 double speed = 4.5f;
                 mc.timer.timerSpeed = 0.5f;
 
-                if (redeskyMode.is("Fast")) {
+                if (aacfiveMode.is("Fast")) {
                     speed = 8.5;
                     mc.timer.timerSpeed = 2;
                 }
@@ -1546,7 +1547,7 @@ public final class Fly extends Module {
     @Override
     public void onStrafe(final StrafeEvent event) {
         switch (mode.getMode()) {
-            case "Hypixel Fast Lag": {
+            case "Old Hypixel Fast Lag": {
                 mc.thePlayer.motionY = mc.gameSettings.keyBindJump.isKeyDown() ? 0.42F : mc.gameSettings.keyBindSneak.isKeyDown() ? mc.thePlayer.motionY : 0;
                 event.setFriction((float) (mc.thePlayer.moveForward != 0 && mc.thePlayer.moveStrafing != 0 ? flySpeed.getValue() * 0.91F : flySpeed.getValue()));
 
@@ -1554,8 +1555,8 @@ public final class Fly extends Module {
                 break;
             }
 
-            case "Hypixel New": {
-//                event.setSpeed((float) MoveUtil.getBaseMoveSpeed() * 0.91F, Math.random() / 2000);
+            case "Old Hypixel 2": {
+                event.setSpeed((float) MoveUtil.getBaseMoveSpeed() * 0.91F, Math.random() / 2000);
                 break;
             }
         }
@@ -1563,11 +1564,11 @@ public final class Fly extends Module {
 
     @Override
     public void onMoveButton(final MoveButtonEvent event) {
-        if (!mode.is("Creative") && !mode.is("Redesky"))
+        if (!mode.is("Creative") && !mode.is("AAC5"))
             event.setSneak(false);
 
         switch (mode.getMode()) {
-            case "Vulcan2":
+            case "Vulcan 2":
                 if (ticksSinceFlag <= 20 && ticksSinceFlag > 0) {
                     event.setBackward(false);
                     event.setForward(false);
@@ -1588,7 +1589,7 @@ public final class Fly extends Module {
 
         switch (mode.getMode()) {
 
-            case "MineBox":
+            case "Minebox":
                 if (PlayerUtil.generalAntiPacketLog() && PlayerUtil.isOnServer("minebox") && p instanceof C03PacketPlayer) {
                     event.setCancelled(true);
                 }
@@ -1602,14 +1603,14 @@ public final class Fly extends Module {
                 }
                 break;
 
-            case "Hypixel Blink":
+            case "Old Hypixel Blink":
                 if (!(p instanceof C01PacketChatMessage) && pearlSlot == -1) {
                     packets.add(p);
                     event.setCancelled(true);
                 }
                 break;
 
-            case "Spartan":
+            case "Air Jump":
                 if (flag) {
                     event.setCancelled(true);
                     if (!(p instanceof C00PacketKeepAlive) && !(p instanceof C0FPacketConfirmTransaction)) {
@@ -1623,7 +1624,7 @@ public final class Fly extends Module {
                 }
                 break;
 
-            case "Minemenclub":
+            case "Minemen Club":
                 if (!jumped || mc.thePlayer == null) {
                     packets.clear();
                     return;
@@ -1635,7 +1636,7 @@ public final class Fly extends Module {
                 }
                 break;
 
-            case "Verus":
+            case "Verus Damage":
                 if (ticks < 30 || !autoStop.isEnabled()) {
                     if (p instanceof C0BPacketEntityAction) {
                         final C0BPacketEntityAction c0B = (C0BPacketEntityAction) p;
@@ -1655,7 +1656,7 @@ public final class Fly extends Module {
                 }
                 break;
 
-            case "Hypixel Fast Lag":
+            case "Old Hypixel Fast Lag":
                 packets.add(p);
                 event.setCancelled(true);
                 break;
@@ -1665,7 +1666,7 @@ public final class Fly extends Module {
     @Override
     public void onBlockCollide(final BlockCollideEvent event) {
         switch (mode.getMode()) {
-            case "VerusBlack": {
+            case "Verus Float": {
                 if (event.getBlock() instanceof BlockAir && !mc.thePlayer.isSneaking()) {
                     final double x = event.getX(), y = event.getY(), z = event.getZ();
 
@@ -1699,7 +1700,7 @@ public final class Fly extends Module {
         if (p instanceof S08PacketPlayerPosLook) {
             final S08PacketPlayerPosLook s08 = (S08PacketPlayerPosLook) p;
             switch (mode.getMode()) {
-                case "Hypixel New":
+                case "Old Hypixel 2":
                     clipped = true;
                     break;
                 case "Redesky":
@@ -1711,7 +1712,7 @@ public final class Fly extends Module {
                     this.registerNotification("Disabled " + this.getModuleInfo().name() + " due to flag.");
                     break;
 
-                case "Minemenclub":
+                case "Minemen Club":
                     event.setCancelled(true);
                     break;
 
@@ -1720,7 +1721,7 @@ public final class Fly extends Module {
                     hypixelStart = true;
                     break;
 
-                case "Vulcan2":
+                case "Vulcan 2":
                     if (mc.thePlayer.ticksExisted > 20) {
                         if (Math.abs(s08.x - startingLocationX) + Math.abs(s08.y - startingLocationY) + Math.abs(s08.z - startingLocationZ) < 4) {
                             if (PlayerUtil.generalAntiPacketLog()) event.setCancelled(true);
