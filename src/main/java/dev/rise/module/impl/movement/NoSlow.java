@@ -1,8 +1,3 @@
-/*
- Copyright Alan Wood 2021
- None of this code to be reused without my written permission
- Intellectual Rights owned by Alan Wood
- */
 package dev.rise.module.impl.movement;
 
 import dev.rise.event.impl.motion.PostMotionEvent;
@@ -23,9 +18,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 /**
- * Makes you automatically sprint without pressing the sprint key.
- * <p>
- * Wtf is this description
+ * Prevents you from slowing down when using items.
  */
 @ModuleInfo(name = "NoSlow", description = "Prevents you from slowing down when using items", category = Category.MOVEMENT)
 public final class NoSlow extends Module {
