@@ -54,9 +54,9 @@ public final class Fly extends Module {
             // AAC Flies
             "AAC3", "AAC5",
             // Flies that bypass multiple anticheats
-            "Air Walk", "Air Jump", "Collide", "Bow Longjump",
+            "Air Walk", "Air Jump", "Collide", "Bow Longjump", "Wait for Damage",
             "Bow Longjump", "Mush", "Viper", "Bow Fly", "ACR", "ACR 2", "Collide",
-            "Air Jump", "MCCentral", "Exempted Value", "Kauri", "Taka", "Vicnix", "Wait for Damage", "Old NCP", "Minemen Club",
+            "Air Jump", "MCCentral", "Exempted Value", "Kauri", "Taka", "Vicnix", "Old NCP", "Minemen Club",
             "Block Fly", "Matrix1.17", 
             // Vulcan Flies
             "Vulcan", "Vulcan2", 
