@@ -1,8 +1,3 @@
-/*
- Copyright Alan Wood 2021
- None of this code to be reused without my written permission
- Intellectual Rights owned by Alan Wood
- */
 package dev.rise.module.impl.player;
 
 import dev.rise.event.impl.motion.PostMotionEvent;
@@ -63,7 +58,7 @@ import java.util.List;
 public final class Scaffold extends Module {
 
     private final NoteSetting modeSettings = new NoteSetting("Mode Settings", this);
-    private final ModeSetting rotations = new ModeSetting("Rotations", this, "Normal", "None", "Normal", "Simple", "Down", "Snap", "Bruteforce", "Pitch Abuse");
+    private final ModeSetting rotations = new ModeSetting("Rotations", this, "Normal", "None", "Normal", "Simple", "Vulcan", "Down", "Snap", "Bruteforce", "Pitch Abuse");
     private final ModeSetting tower = new ModeSetting("Tower", this, "None", "None", "Vanilla", "Slow", "Verus", "Intave", "Hypixel");
     private final ModeSetting movementFix = new ModeSetting("Movement Fix", this, "None", "None", "Yaw", "Hidden");
     private final ModeSetting sprint = new ModeSetting("Sprint", this, "Normal", "Normal", "Disabled", "Bypass", "Legit");
@@ -90,7 +85,7 @@ public final class Scaffold extends Module {
     private final BooleanSetting ignoreSpeed = new BooleanSetting("Ignore Speed", this, false);
     private final BooleanSetting towerMove = new BooleanSetting("Tower Move", this, true);
     private final ModeSetting rayCast = new ModeSetting("Ray Cast", this, "Normal", "Normal", "Strict", "Off");
-    private final ModeSetting placeOn = new ModeSetting("Place on", this, "Legit", "Legit", "Post");
+    private final ModeSetting placeOn = new ModeSetting("Place on", this, "Pre", "Pre", "Post");
     private final BooleanSetting dragClick = new BooleanSetting("Drag Click", this, false);
     private final BooleanSetting jitter = new BooleanSetting("Jitter", this, false);
     private final BooleanSetting telly = new BooleanSetting("Telly", this, false);
@@ -238,7 +233,7 @@ public final class Scaffold extends Module {
             }
 
             case "Bypass": {
-                mc.thePlayer.setSprinting(false);
+                mc.thePlayer.setSprinting(true);
                 break;
             }
 
@@ -444,6 +439,28 @@ public final class Scaffold extends Module {
 
                         targetYaw = yaw;
                         targetPitch = 90;
+                        break;
+                    }
+
+                    case "Vulcan": {
+
+                        float rotationYaw = mc.thePlayer.rotationYaw;
+
+                        if (mc.thePlayer.moveForward < 0 && mc.thePlayer.moveStrafing == 0) {
+                            rotationYaw += 180;
+                        }
+
+                        if (mc.thePlayer.moveStrafing > 0) {
+                            rotationYaw -= 90;
+                        }
+
+                        if (mc.thePlayer.moveStrafing < 0) {
+                            rotationYaw += 90;
+                        }
+
+                        this.yaw = (float) (Math.toRadians(rotationYaw) * (180 / Math.PI) - 180 + Math.random());
+                        this.pitch = (float) (87 + Math.random());
+
                         break;
                     }
 
@@ -677,7 +694,7 @@ public final class Scaffold extends Module {
 
     @Override
     public void onCanPlaceBlockEvent(final CanPlaceBlockEvent event) {
-        if (placeOn.is("Legit")) {
+        if (placeOn.is("Pre")) {
             this.placeBlock();
         }
     }
