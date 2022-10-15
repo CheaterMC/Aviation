@@ -146,11 +146,20 @@ public final class Fly extends Module {
                 mc.thePlayer.capabilities.allowFlying = startFlyingCapability;
                 break;
 
+            case "Minemen Club 2": {
+                if (mc.thePlayer.inventory.currentItem != i)
+                    PacketUtil.sendPacketWithoutEvent(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+            }
+
             case "Bow Longjump":
                 if (flag) {
                     if (mc.thePlayer.inventory.currentItem != i)
                         PacketUtil.sendPacketWithoutEvent(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                 }
+                break;
+
+            case "Air Walk":
+                viewBobbing.value = 0.0f;
                 break;
 
             case "Vicnix":
@@ -237,7 +246,7 @@ public final class Fly extends Module {
 
 
         // Good code?, Who cares.W
-        if (fakeDamage.isEnabled() && !(mode.is("Verus Damage") || mode.is("Minemen Club") || mode.is("Old NCP") || mode.is("Bow Longjump") || mode.is("Vulcan 2") || mode.is("Damage") || mode.is("Wait for Damage") || mode.is("Bow Fly") || mode.is("ACR") || mode.is("AAC3") || mode.is("Taka"))) {
+        if (fakeDamage.isEnabled() && !(mode.is("Verus Damage") || mode.is("Minemen Club") || mode.is("Old NCP") || mode.is("Bow Longjump") || mode.is("Minemenclub 2") || mode.is("Vulcan 2") || mode.is("Damage") || mode.is("Wait for Damage") || mode.is("Bow Fly") || mode.is("ACR") || mode.is("AAC3") || mode.is("Taka"))) {
             mc.thePlayer.handleHealthUpdate((byte) 2);
         }
 
@@ -249,12 +258,35 @@ public final class Fly extends Module {
                     this.registerNotification("You need speed effect to make the fly work.");
                 }
                 break;
+
+            case "Air Walk": {
+                viewBobbing.value = 0.1f;
+                if (!firstEnable) {
+                    firstEnable = true;
+                }
+            }
+
             case "AAC5":
                 if (!firstEnable) {
                     firstEnable = true;
                     this.registerNotification("Credits to Dort for the fly.");
                 }
                 break;
+
+            case "Hycraft": {
+                flag = false;
+                pearlTimer.reset();
+
+                if (!mc.thePlayer.onGround) {
+                    this.toggleModule();
+                    Rise.INSTANCE.getNotificationManager().registerNotification("You need to be on ground!");
+                    return;
+                }
+
+                PacketUtil.sendPacketWithoutEvent(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY - 2 + Math.random() / 2, mc.thePlayer.posZ, false));
+
+                break;
+            }
 
             case "Vulcan":
                 if (inf.isEnabled() && !firstEnable) {
@@ -280,9 +312,11 @@ public final class Fly extends Module {
 
         autoStop.hidden = !mode.is("Verus Damage");
 
+        sprint.hidden = !mode.is("Air Walk");
+
         hypixelFlySpeed.hidden = !mode.is("Old Hypixel 2");
 
-        flySpeed.hidden = !(mode.is("Vanilla") || mode.is("Minebox") || mode.is("Old Hypixel Fast Lag") || mode.is("Taka") || mode.is("Minemenclub") || mode.is("Old NCP") || mode.is("Mush") || mode.is("Viper") || mode.is("Verus Lag") || mode.is("Verus Damage") || mode.is("Collide") || mode.is("Creative") || mode.is("Damage") || mode.is("Old Hypixel Infinite") || mode.is("Old Hypixel Blink") || mode.is("Old Hypixel"));
+        flySpeed.hidden = !(mode.is("Vanilla") || mode.is("Minebox") || mode.is("Old Hypixel Fast Lag") || mode.is("Taka") || mode.is("Minemen Club 2") || mode.is("Minemenclub") || mode.is("Old NCP") || mode.is("Mush") || mode.is("Viper") || mode.is("Verus Lag") || mode.is("Verus Damage") || mode.is("Collide") || mode.is("Creative") || mode.is("Damage") || mode.is("Old Hypixel Infinite") || mode.is("Old Hypixel Blink") || mode.is("Old Hypixel"));
 
         fakeDamage.hidden = (mode.is("Verus") || mode.is("Minemen Club") || mode.is("Old NCP") || mode.is("Bow Longjump") || mode.is("Vulcan 2") || mode.is("Damage") || mode.is("Wait for Damage") || mode.is("Bow Fly") || mode.is("ACR") || mode.is("AAC3") || mode.is("Taka"));
 
@@ -352,6 +386,20 @@ public final class Fly extends Module {
         switch (mode.getMode()) {
             case "Old Hypixel Fast Lag": {
                 hypixelDisabler();
+                break;
+            }
+
+            case "Hycraft": {
+                MoveUtil.strafe(1.2 + Math.random() / 10D);
+                mc.thePlayer.motionY = (mc.gameSettings.keyBindJump.isKeyDown() ? 0.42F : mc.gameSettings.keyBindSneak.isKeyDown() ? -0.42F : 0);
+
+                if (!MoveUtil.isMoving()) MoveUtil.stop();
+
+                if (pearlTimer.hasReached((long) (150 + Math.random() * 50)) && MoveUtil.isMoving()) {
+                    pearlTimer.reset();
+                    PacketUtil.sendPacketWithoutEvent(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, true));
+                }
+
                 break;
             }
 
@@ -437,7 +485,7 @@ public final class Fly extends Module {
                 if (!MoveUtil.isMoving()) MoveUtil.stop();
                 break;
 
-            case "Hypixel New": {
+            case "Old Hypixel 2": {
 
                 wasos++;
 
@@ -1044,7 +1092,7 @@ public final class Fly extends Module {
                 mc.timer.timerSpeed = (float) (0.3 - Math.random() / 500);
                 break;
 
-            case "Verus AirJump": {
+            case "Verus Air Jump": {
                 MoveUtil.strafe();
                 if (!mc.gameSettings.keyBindSneak.isKeyDown()) {
                     if (mc.gameSettings.keyBindJump.isKeyDown()) {
@@ -1066,6 +1114,24 @@ public final class Fly extends Module {
                             mc.thePlayer.fallDistance = 0;
                             event.setGround(true);
                         }
+                    }
+                }
+                break;
+            }
+
+            case "Air Walk": {
+                // SPRINT BYPASSE
+                if(sprint.isEnabled()) {
+                    mc.thePlayer.setSprinting(true);
+                } else {
+                    mc.thePlayer.setSprinting(false);
+                }
+                if (!mc.gameSettings.keyBindSneak.isKeyDown()) {
+                    mc.thePlayer.motionY = -(mc.thePlayer.posY - roundToOnGround(mc.thePlayer.posY));
+                    if (MoveUtil.isMoving()) {
+                        MoveUtil.strafe(0.255);
+                    } else {
+                        MoveUtil.stop();
                     }
                 }
                 break;
